@@ -1,6 +1,8 @@
 package com.geekbrains.tests.view.search
 
+import android.content.Context
 import android.os.Bundle
+import android.util.AttributeSet
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.TextView.OnEditorActionListener
@@ -27,6 +29,12 @@ class MainActivity : AppCompatActivity(), ViewSearchContract {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setUI()
+    }
+
+    override fun onCreateView(name: String, context: Context, attrs: AttributeSet): View? {
+        val view = super.onCreateView(name, context, attrs)
+        view?.let { presenter.onAttach(it) }
+        return view
     }
 
     private fun setUI() {
@@ -95,6 +103,11 @@ class MainActivity : AppCompatActivity(), ViewSearchContract {
         } else {
             progressBar.visibility = View.GONE
         }
+    }
+
+    override fun onDestroy() {
+        presenter.onDetach()
+        super.onDestroy()
     }
 
     companion object {
