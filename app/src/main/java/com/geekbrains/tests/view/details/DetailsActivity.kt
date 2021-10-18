@@ -3,6 +3,8 @@ package com.geekbrains.tests.view.details
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.AttributeSet
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import com.geekbrains.tests.R
 import com.geekbrains.tests.presenter.details.DetailsPresenter
@@ -20,6 +22,12 @@ class DetailsActivity : AppCompatActivity(), ViewDetailsContract {
         setUI()
     }
 
+    override fun onCreateView(name: String, context: Context, attrs: AttributeSet): View? {
+        val view = super.onCreateView(name, context, attrs)
+        view?.let { presenter.onAttach(it) }
+        return view
+    }
+
     private fun setUI() {
         val count = intent.getIntExtra(TOTAL_COUNT_EXTRA, 0)
         presenter.setCounter(count)
@@ -35,6 +43,11 @@ class DetailsActivity : AppCompatActivity(), ViewDetailsContract {
     private fun setCountText(count: Int) {
         totalCountTextView.text =
             String.format(Locale.getDefault(), getString(R.string.results_count), count)
+    }
+
+    public override fun onDestroy() {
+        presenter.onDetach()
+        super.onDestroy()
     }
 
     companion object {
