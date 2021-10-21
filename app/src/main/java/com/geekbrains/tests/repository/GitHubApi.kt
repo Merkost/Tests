@@ -7,7 +7,7 @@ import retrofit2.http.Headers
 import retrofit2.http.Query
 
 /**
- * Документация https://developer.github.com/v3/search/
+ * Документация https://developer.github.com.geekbrains.tests.fake/v3/search/
  */
 
 internal interface GitHubApi {
