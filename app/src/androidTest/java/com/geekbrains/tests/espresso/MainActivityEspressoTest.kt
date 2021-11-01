@@ -11,6 +11,7 @@ import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.geekbrains.tests.BuildConfig
 import com.geekbrains.tests.R
+import com.geekbrains.tests.delay
 import com.geekbrains.tests.view.search.MainActivity
 import org.hamcrest.Matcher
 import org.junit.After
@@ -39,16 +40,6 @@ class MainActivityEspressoTest {
         } else {
             onView(isRoot()).perform(delay())
             onView(withId(R.id.totalCountTextView)).check(matches(withText("Number of results: 2283")))
-        }
-    }
-
-    private fun delay(): ViewAction? {
-        return object : ViewAction {
-            override fun getConstraints(): Matcher<View> = isRoot()
-            override fun getDescription(): String = "wait for $2 seconds"
-            override fun perform(uiController: UiController, v: View?) {
-                uiController.loopMainThreadForAtLeast(2000)
-            }
         }
     }
 
