@@ -67,13 +67,8 @@ class BehaviorTest {
         //Устанавливаем значение
         editText.text = "UiAutomator"
         //Отправляем запрос через Espresso
-
-        //Заменяем Espresso на UI Automator
-        /*Espresso.onView(ViewMatchers.withId(R.id.searchEditText))
-            .perform(ViewActions.pressImeActionButton())*/
-        // ->
-
-        uiDevice.findObject(By.res(packageName, "searchButton")).click()
+        Espresso.onView(ViewMatchers.withId(R.id.searchEditText))
+            .perform(ViewActions.pressImeActionButton())
 
         //Ожидаем конкретного события: появления текстового поля totalCountTextView.
         //Это будет означать, что сервер вернул ответ с какими-то данными, то есть запрос отработал.
@@ -84,7 +79,7 @@ class BehaviorTest {
             )
         //Убеждаемся, что сервер вернул корректный результат. Обратите внимание, что количество
         //результатов может варьироваться во времени, потому что количество репозиториев постоянно меняется.
-        Assert.assertEquals(changedText.text.toString(), "Number of results: 684")
+        Assert.assertEquals(changedText.text.toString(), "Number of results: 668")
     }
 
     //Убеждаемся, что DetailsScreen открывается
@@ -113,69 +108,6 @@ class BehaviorTest {
         //Чтобы проверить отображение определенного количества репозиториев,
         //вам в одном и том же методе нужно отправить запрос на сервер и открыть DetailsScreen.
         Assert.assertEquals(changedText.text, "Number of results: 0")
-    }
-
-    //Убеждаемся, что DetailsScreen открывается c верным количеством результатов!
-    @Test
-    fun test_OpenDetailsScreenIsCorrect() {
-        //Выполняем поиск
-        test_SearchIsPositive()
-
-        val toDetails: UiObject2 = uiDevice.findObject(By.res(packageName, "toDetailsActivityButton"))
-        toDetails.click()
-
-        //Если не подождем открытия активити, то тест будет не пройден!
-        uiDevice.waitForWindowUpdate(packageName, TIMEOUT)
-
-        val changedText: UiObject2 =
-            uiDevice.wait(
-                Until.findObject(By.res(packageName, "totalCountTextView")),
-                TIMEOUT)
-
-        Assert.assertEquals(changedText.text, "Number of results: 684")
-    }
-
-    //Убеждаемся, что кнопки на DetailsScreen работают корректно
-    @Test
-    fun test_DetailsScreenIncrementButtonsIsWorking() {
-        val toDetails: UiObject2 = uiDevice.findObject(By.res(packageName, "toDetailsActivityButton"))
-        toDetails.click()
-
-        //Если не подождем открытия активити, то тест будет не пройден!
-        uiDevice.waitForWindowUpdate(packageName, TIMEOUT)
-
-        val incrementButton: UiObject2 = uiDevice.findObject(
-            By.res(packageName, "incrementButton"))
-
-        val changedText: UiObject2 =
-            uiDevice.wait(
-                Until.findObject(By.res(packageName, "totalCountTextView")),
-                TIMEOUT)
-
-        Assert.assertEquals(changedText.text, "Number of results: 0")
-        incrementButton.click()
-        Assert.assertEquals(changedText.text, "Number of results: 1")
-    }
-
-    @Test
-    fun test_DetailsScreenDecrementButtonsIsWorking() {
-        val toDetails: UiObject2 = uiDevice.findObject(By.res(packageName, "toDetailsActivityButton"))
-        toDetails.click()
-
-        //Если не подождем открытия активити, то тест будет не пройден!
-        uiDevice.waitForWindowUpdate(packageName, TIMEOUT)
-
-        val decrementButton: UiObject2 = uiDevice.findObject(
-            By.res(packageName, "decrementButton"))
-
-        val changedText: UiObject2 =
-            uiDevice.wait(
-                Until.findObject(By.res(packageName, "totalCountTextView")),
-                TIMEOUT)
-
-        Assert.assertEquals(changedText.text, "Number of results: 0")
-        decrementButton.click()
-        Assert.assertEquals(changedText.text, "Number of results: -1")
     }
 
     companion object {

@@ -5,6 +5,7 @@ import com.geekbrains.tests.presenter.RepositoryContract
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import retrofit2.await
 
 internal class GitHubRepository(private val gitHubApi: GitHubApi) : RepositoryContract {
 
@@ -30,4 +31,8 @@ internal class GitHubRepository(private val gitHubApi: GitHubApi) : RepositoryCo
             }
         })
     }
+
+    override suspend fun searchGithubAsync(query: String) =
+        gitHubApi.searchGithubAsync(query).await()
+
 }

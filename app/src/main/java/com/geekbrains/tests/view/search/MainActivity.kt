@@ -1,6 +1,5 @@
 package com.geekbrains.tests.view.search
 
-import android.app.Activity
 import android.content.Context
 import android.os.Bundle
 import android.view.View
@@ -10,11 +9,13 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.TextView.OnEditorActionListener
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.WindowCompat
+import androidx.lifecycle.ViewModelProvider
 import com.geekbrains.tests.BuildConfig
 import com.geekbrains.tests.R
 import com.geekbrains.tests.model.SearchResult
 import com.geekbrains.tests.presenter.RepositoryContract
+import com.geekbrains.tests.presenter.ScreenState
+import com.geekbrains.tests.presenter.SearchViewModel
 import com.geekbrains.tests.presenter.search.PresenterSearchContract
 import com.geekbrains.tests.presenter.search.SearchPresenter
 import com.geekbrains.tests.repository.FakeGitHubRepository
@@ -33,13 +34,49 @@ class MainActivity : AppCompatActivity(), ViewSearchContract {
     private val presenter: PresenterSearchContract = SearchPresenter(this, createRepository())
     private var totalCount: Int = 0
 
+    private val viewModel: SearchViewModel by lazy {
+        ViewModelProvider(this).get(SearchViewModel::class.java)
+    }
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         window.addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
         setContentView(R.layout.activity_main)
-
         setUI()
+
+        viewModel.subscribeToLiveData().observe(this) { onStateChange(it) }
     }
+
+    private fun onStateChange(screenState: ScreenState) {
+        when (screenState) {
+            is ScreenState.Working -> {
+                val searchResponse = screenState.searchResponse
+                val totalCount = searchResponse.totalCount
+                progressBar.visibility = View.GONE
+                with(totalCountTextView) {
+                    visibility = View.VISIBLE
+                    text =
+                        String.format(
+                            Locale.getDefault(),
+                            getString(R.string.results_count),
+                            totalCount
+                        )
+                }
+
+                this.totalCount = totalCount!!
+                adapter.updateResults(searchResponse.searchResults!!)
+            }
+            is ScreenState.Loading -> {
+                progressBar.visibility = View.VISIBLE
+            }
+            is ScreenState.Error -> {
+                progressBar.visibility = View.GONE
+                Toast.makeText(this, screenState.error.message, Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
 
     private fun setUI() {
         toDetailsActivityButton.setOnClickListener {
@@ -57,8 +94,8 @@ class MainActivity : AppCompatActivity(), ViewSearchContract {
     private fun setQueryListener() {
         searchEditText.setOnEditorActionListener(OnEditorActionListener { view, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-                searchAction()
                 view.hideKeyboard()
+                searchAction()
             }
             false
         })
